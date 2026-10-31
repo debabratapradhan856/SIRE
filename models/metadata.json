@@ -1,0 +1,145 @@
+{
+  "best_model": "GradientBoosting",
+  "feature_cols": [
+    "Speed_kmh",
+    "Acceleration_ms2",
+    "Battery_State_%",
+    "Battery_Voltage_V",
+    "Battery_Temperature_C",
+    "Driving_Mode",
+    "Road_Type",
+    "Traffic_Condition",
+    "Slope_%",
+    "Weather_Condition",
+    "Temperature_C",
+    "Humidity_%",
+    "Wind_Speed_ms",
+    "Tire_Pressure_psi",
+    "Vehicle_Weight_kg",
+    "Distance_Travelled_km"
+  ],
+  "metrics": {
+    "random_forest": {
+      "r2": 0.9116853470616856,
+      "mae": 0.5188329711879428,
+      "rmse": 0.6544159773647484
+    },
+    "gradient_boosting": {
+      "r2": 0.9285382858282694,
+      "mae": 0.4738941142871592,
+      "rmse": 0.5886731470215385
+    }
+  },
+  "feature_importances": [
+    {
+      "feature": "Speed_kmh",
+      "importance": 0.6547
+    },
+    {
+      "feature": "Distance_Travelled_km",
+      "importance": 0.2005
+    },
+    {
+      "feature": "Battery_State_%",
+      "importance": 0.047
+    },
+    {
+      "feature": "Humidity_%",
+      "importance": 0.0346
+    },
+    {
+      "feature": "Battery_Temperature_C",
+      "importance": 0.0177
+    },
+    {
+      "feature": "Slope_%",
+      "importance": 0.0084
+    },
+    {
+      "feature": "Wind_Speed_ms",
+      "importance": 0.007
+    },
+    {
+      "feature": "Acceleration_ms2",
+      "importance": 0.0053
+    },
+    {
+      "feature": "Tire_Pressure_psi",
+      "importance": 0.0052
+    },
+    {
+      "feature": "Battery_Voltage_V",
+      "importance": 0.005
+    },
+    {
+      "feature": "Vehicle_Weight_kg",
+      "importance": 0.0048
+    },
+    {
+      "feature": "Temperature_C",
+      "importance": 0.0046
+    },
+    {
+      "feature": "Weather_Condition",
+      "importance": 0.0016
+    },
+    {
+      "feature": "Driving_Mode",
+      "importance": 0.0015
+    },
+    {
+      "feature": "Road_Type",
+      "importance": 0.0012
+    },
+    {
+      "feature": "Traffic_Condition",
+      "importance": 0.0011
+    }
+  ],
+  "cluster_profiles": {
+    "0": {
+      "name": "Eco-Smooth Cruiser",
+      "count": 1298,
+      "pct": 26.0,
+      "avg_speed": 31.13,
+      "avg_acceleration": -1.51,
+      "avg_energy": 6.75,
+      "avg_slope": 2.18
+    },
+    "1": {
+      "name": "Aggressive High-Speed",
+      "count": 1242,
+      "pct": 24.8,
+      "avg_speed": 87.96,
+      "avg_acceleration": -0.226,
+      "avg_energy": 10.35,
+      "avg_slope": 6.57
+    },
+    "2": {
+      "name": "Urban Stop & Go",
+      "count": 1190,
+      "pct": 23.8,
+      "avg_speed": 89.2,
+      "avg_acceleration": 0.103,
+      "avg_energy": 9.97,
+      "avg_slope": -1.42
+    },
+    "3": {
+      "name": "Heavy Mountain / Terrain",
+      "count": 1270,
+      "pct": 25.4,
+      "avg_speed": 32.1,
+      "avg_acceleration": 1.589,
+      "avg_energy": 6.86,
+      "avg_slope": 2.54
+    }
+  },
+  "dataset_stats": {
+    "total_samples": 5000,
+    "avg_energy_kwh": 8.44,
+    "min_energy_kwh": 1.88,
+    "max_energy_kwh": 14.66,
+    "avg_speed_kmh": 59.31,
+    "avg_efficiency_km_kwh": 2.95
+  }
+}
