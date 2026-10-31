@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Driving Efficiency Optimizer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-border {
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            padding: 1px;
+            border-radius: 1rem;
+        }
+        input[type=range] {
+            accent-color: #10b981;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- Top Navigation -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <i data-lucide="zap" class="w-6 h-6 text-slate-950 stroke-[2.5]"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                        AI Driving Efficiency Optimizer
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Scikit-learn Model</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Behavioral Telematics &bull; Energy Prediction &bull; Contextual AI Driving Tips</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="model-status" class="inline-flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Model: Gradient Boosting (R² = 0.928)
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Preset Quick Bar -->
+        <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
+                Preset Scenarios:
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="applyPreset('highway')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition font-medium">🏎️ Aggressive Speeder</button>
+                <button onclick="applyPreset('urban')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition font-medium">🏙️ Urban Stop & Go</button>
+                <button onclick="applyPreset('mountain')" class="text-xs px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition font-medium">⛰️ Mountain Climb</button>
+                <button onclick="applyPreset('eco')" class="text-xs px-3 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/30 transition font-medium">🌱 Optimal Eco-Cruiser</button>
+            </div>
+        </div>
+
+        <!-- Upper Grid: Telemetry Controls vs Output Metrics -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <!-- Controls Column (5 cols) -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6 shadow-xl space-y-5">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-700">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i>
+                            Live Driving Telematics
+                        </h2>
+                        <span class="text-xs text-slate-400">Instant Recalculation</span>
+                    </div>
+
+                    <!-- Speed Slider -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-400 font-medium">Cruising Speed</span>
+                            <span id="val-speed" class="font-bold text-emerald-400">65 km/h</span>
+                        </div>
+                        <input id="input-speed" type="range" min="10" max="150" value="65" step="1" class="w-full h-2 bg-slate-700 rounded-lg cursor-pointer" oninput="onTelemetryChange()">
+                    </div>
+
+                    <!-- Acceleration / Braking Slider -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-400 font-medium">Acceleration / Braking</span>
+                            <span id="val-accel" class="font-bold text-emerald-400">-0.20 m/s²</span>
+                        </div>
+                        <input id="input-accel" type="range" min="-3.0" max="3.0" value="-0.2" step="0.1" class="w-full h-2 bg-slate-700 rounded-lg cursor-pointer" oninput="onTelemetryChange()">
+                        <div class="flex justify-between text-[10px] text-slate-400 px-1">
+                            <span>-3.0 (Hard Braking)</span>
+                            <span>0.0 (Coast)</span>
+                            <span>+3.0 (Max Throttle)</span>
+                        </div>
+                    </div>
+
+                    <!-- Terrain Slope Slider -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-400 font-medium">Terrain Gradient (Slope %)</span>
+                            <span id="val-slope" class="font-bold text-emerald-400">+2.5 %</span>
+                        </div>
+                        <input id="input-slope" type="range" min="-5.0" max="10.0" value="2.5" step="0.5" class="w-full h-2 bg-slate-700 rounded-lg cursor-pointer" oninput="onTelemetryChange()">
+                        <div class="flex justify-between text-[10px] text-slate-400 px-1">
+                            <span>-5% (Downhill)</span>
+                            <span>Flat</span>
+                            <span>+10% (Steep Hill)</span>
+                        </div>
+                    </div>
+
+                    <!-- Driving Mode Selection -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs text-slate-400 font-medium">Driving Mode</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button id="btn-mode-1" onclick="setMode(1)" class="py-2 px-3 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 transition">Eco</button>
+                            <button id="btn-mode-2" onclick="setMode(2)" class="py-2 px-3 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 transition">Sport</button>
+                            <button id="btn-mode-3" onclick="setMode(3)" class="py-2 px-3 text-xs font-semibold rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-emerald-500 transition">Comfort</button>
+                        </div>
+                    </div>
+
+                    <!-- Road Type & Distance -->
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div class="space-y-1">
+                            <label class="text-xs text-slate-400 font-medium">Road Type</label>
+                            <select id="input-road" class="w-full bg-slate-750 bg-slate-900 border border-slate-700 text-xs text-slate-200 rounded-lg p-2 focus:ring-1 focus:ring-emerald-500" onchange="onTelemetryChange()">
+                                <option value="1">Highway</option>
+                                <option value="2">Urban</option>
+                                <option value="3">Rural</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400 font-medium">Distance</span>
+                                <span id="val-dist" class="font-bold text-slate-300">25 km</span>
+                            </div>
+                            <input id="input-dist" type="range" min="1" max="100" value="25" step="1" class="w-full h-2 bg-slate-700 rounded-lg cursor-pointer" oninput="onTelemetryChange()">
+                        </div>
+                    </div>
+
+                    <!-- Environmental Collapsible -->
+                    <details class="group pt-2 border-t border-slate-700/80">
+                        <summary class="text-xs font-semibold text-slate-400 cursor-pointer flex justify-between items-center py-1">
+                            <span>Battery & Weather Details</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-500 group-open:rotate-180 transition"></i>
+                        </summary>
+                        <div class="space-y-3 pt-3">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-xs">
+                                        <span class="text-slate-400">Battery SOC</span>
+                                        <span id="val-soc" class="font-bold text-slate-300">65%</span>
+                                    </div>
+                                    <input id="input-soc" type="range" min="10" max="100" value="65" step="1" class="w-full h-2 bg-slate-700 rounded-lg" oninput="onTelemetryChange()">
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-xs">
+                                        <span class="text-slate-400">Tire Pressure</span>
+                                        <span id="val-tire" class="font-bold text-slate-300">31.5 psi</span>
+                                    </div>
+                                    <input id="input-tire" type="range" min="26" max="38" value="31.5" step="0.5" class="w-full h-2 bg-slate-700 rounded-lg" oninput="onTelemetryChange()">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-xs">
+                                        <span class="text-slate-400">Ambient Temp</span>
+                                        <span id="val-temp" class="font-bold text-slate-300">20°C</span>
+                                    </div>
+                                    <input id="input-temp" type="range" min="-5" max="42" value="20" step="1" class="w-full h-2 bg-slate-700 rounded-lg" oninput="onTelemetryChange()">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-xs text-slate-400">Weather</label>
+                                    <select id="input-weather" class="w-full bg-slate-900 border border-slate-700 text-xs text-slate-200 rounded-lg p-2" onchange="onTelemetryChange()">
+                                        <option value="1">Clear</option>
+                                        <option value="2">Rain</option>
+                                        <option value="3">Snow</option>
+                                        <option value="4">Fog</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <!-- KPI Results & Optimization Impact (7 cols) -->
+            <div class="lg:col-span-7 space-y-6">
+
+                <!-- 4 KPI Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-center">
+                        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Predicted Energy</div>
+                        <div class="mt-2 text-2xl font-bold text-white"><span id="metric-energy">--</span> <span class="text-xs text-slate-400 font-normal">kWh</span></div>
+                        <div class="text-[11px] text-slate-400 mt-1" id="metric-dist-sub">-- km route</div>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-center">
+                        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Trip Efficiency</div>
+                        <div class="mt-2 text-2xl font-bold text-emerald-400"><span id="metric-eff">--</span> <span class="text-xs text-slate-400 font-normal">km/kWh</span></div>
+                        <div class="text-[11px] text-slate-400 mt-1"><span id="metric-wh-km">--</span> Wh/km</div>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-center">
+                        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Eco-Score</div>
+                        <div class="mt-2 text-2xl font-bold" id="metric-score">--</div>
+                        <div class="text-[11px] font-semibold mt-1" id="metric-grade">--</div>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-4 text-center">
+                        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Behavior Style</div>
+                        <div class="mt-2 text-sm font-bold text-slate-200 truncate" id="metric-cluster">--</div>
+                        <div class="text-[11px] text-slate-400 mt-1">K-Means Profile</div>
+                    </div>
+                </div>
+
+                <!-- AI Energy Optimization Banner -->
+                <div class="bg-gradient-to-br from-slate-900 to-slate-800 border border-emerald-500/30 rounded-2xl p-6 relative overflow-hidden shadow-2xl">
+                    <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-700/80">
+                        <div>
+                            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">AI Optimization Impact</span>
+                            <h3 class="text-lg font-bold text-white mt-0.5">Potential Savings with Recommended Driving</h3>
+                        </div>
+                        <div class="px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-sm flex items-center gap-1.5">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                            <span id="banner-range">+0.0 km Extra Range</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 pt-5 text-center">
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase font-semibold">Energy Saved</div>
+                            <div class="text-2xl font-bold text-emerald-400 mt-1" id="banner-saved-kwh">0.00 kWh</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase font-semibold">Consumption Cut</div>
+                            <div class="text-2xl font-bold text-sky-400 mt-1" id="banner-saved-pct">0.0%</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase font-semibold">Optimized Efficiency</div>
+                            <div class="text-2xl font-bold text-amber-400 mt-1" id="banner-opt-eff">0.0 km/kWh</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Side-by-side Chart: Current vs Optimized -->
+                <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
+                        <span>Energy Consumption Comparison</span>
+                        <span class="text-[11px] font-normal text-slate-400">Current vs AI Optimized</span>
+                    </h4>
+                    <div class="h-44">
+                        <canvas id="chart-comparison"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Actionable Driving Tips (Direct Problem Statement Output) -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i data-lucide="compass" class="w-5 h-5 text-emerald-400"></i>
+                        Actionable Driving Tips Based on Prediction Results
+                    </h2>
+                    <p class="text-xs text-slate-400">Real-time dynamic recommendations derived from Scikit-learn predictions & physics boundaries</p>
+                </div>
+                <span id="tips-count" class="text-xs font-semibold px-2.5 py-1 bg-slate-800 border border-slate-700 rounded-full text-slate-300">0 Tips Generated</span>
+            </div>
+
+            <!-- Tips Container -->
+            <div id="tips-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Dynamically populated via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Section 3: Telemetry Analysis Charts (Speed Curve & Radar) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6 space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
+                        Energy Consumption vs Speed Curve
+                    </h3>
+                    <span class="text-xs text-emerald-400 font-medium">Sweet Spot: 60-80 km/h</span>
+                </div>
+                <div class="h-64">
+                    <canvas id="chart-speed-curve"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6 space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <i data-lucide="radar" class="w-4 h-4 text-emerald-400"></i>
+                        Driving Behavior Radar
+                    </h3>
+                    <span class="text-xs text-slate-400">Normalized Attributes</span>
+                </div>
+                <div class="h-64 flex items-center justify-center">
+                    <canvas id="chart-radar"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: 10-Segment Trip Simulation -->
+        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-emerald-400"></i>
+                        Simulated Route Journey Replay (10 Highway & Urban Segments)
+                    </h3>
+                    <p class="text-xs text-slate-400">Simulate variable terrain gradients, stop-and-go congestion, and high-speed highway segments</p>
+                </div>
+                <button onclick="runRouteSimulation()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-lg text-xs transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20">
+                    <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                    Simulate Trip
+                </button>
+            </div>
+            <div class="h-60">
+                <canvas id="chart-route-sim"></canvas>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        AI-Powered Driving Efficiency Optimizer &bull; Built with Python, Scikit-learn, FastAPI & Tailwind CSS &bull; SIRE Seminar Project
+    </footer>
+
+    <!-- App JavaScript Logic -->
+    <script>
+        let currentDrivingMode = 2; // Default Sport
+        let comparisonChart = null;
+        let speedCurveChart = null;
+        let radarChart = null;
+        let routeSimChart = null;
+
+        const presets = {
+            highway: { speed: 125, accel: 2.2, slope: 1.0, mode: 2, road: 1, dist: 40, soc: 75, tire: 31, temp: 22 },
+            urban: { speed: 45, accel: -2.5, slope: 0.5, mode: 3, road: 2, dist: 15, soc: 50, tire: 30, temp: 28 },
+            mountain: { speed: 65, accel: 1.4, slope: 8.5, mode: 2, road: 3, dist: 25, soc: 60, tire: 32, temp: 8 },
+            eco: { speed: 75, accel: 0.3, slope: 0.0, mode: 1, road: 1, dist: 35, soc: 85, tire: 34, temp: 21 }
+        };
+
+        function setMode(mode) {
+            currentDrivingMode = mode;
+            [1, 2, 3].forEach(m => {
+                const btn = document.getElementById(`btn-mode-${m}`);
+                if (m === mode) {
+                    btn.classList.add('border-emerald-500', 'bg-emerald-500/20', 'text-emerald-300');
+                    btn.classList.remove('border-slate-700', 'bg-slate-800', 'text-slate-300');
+                } else {
+                    btn.classList.remove('border-emerald-500', 'bg-emerald-500/20', 'text-emerald-300');
+                    btn.classList.add('border-slate-700', 'bg-slate-800', 'text-slate-300');
+                }
+            });
+            onTelemetryChange();
+        }
+
+        function applyPreset(name) {
+            const p = presets[name];
+            if (!p) return;
+            document.getElementById('input-speed').value = p.speed;
+            document.getElementById('input-accel').value = p.accel;
+            document.getElementById('input-slope').value = p.slope;
+            document.getElementById('input-road').value = p.road;
+            document.getElementById('input-dist').value = p.dist;
+            document.getElementById('input-soc').value = p.soc;
+            document.getElementById('input-tire').value = p.tire;
+            document.getElementById('input-temp').value = p.temp;
+            setMode(p.mode);
+        }
+
+        function getPayload() {
+            return {
+                Speed_kmh: parseFloat(document.getElementById('input-speed').value),
+                Acceleration_ms2: parseFloat(document.getElementById('input-accel').value),
+                Slope_%: parseFloat(document.getElementById('input-slope').value),
+                Road_Type: parseInt(document.getElementById('input-road').value),
+                Distance_Travelled_km: parseFloat(document.getElementById('input-dist').value),
+                Driving_Mode: currentDrivingMode,
+                Battery_State_%: parseFloat(document.getElementById('input-soc').value),
+                Tire_Pressure_psi: parseFloat(document.getElementById('input-tire').value),
+                Temperature_C: parseFloat(document.getElementById('input-temp').value),
+                Weather_Condition: parseInt(document.getElementById('input-weather').value),
+                Vehicle_Weight_kg: 1850.0,
+                Battery_Voltage_V: 350.0,
+                Battery_Temperature_C: 28.0,
+                Wind_Speed_ms: 6.0,
+                Humidity_%: 55.0
+            };
+        }
+
+        function updateLabels(payload) {
+            document.getElementById('val-speed').innerText = `${payload.Speed_kmh} km/h`;
+            document.getElementById('val-accel').innerText = `${payload.Acceleration_ms2.toFixed(2)} m/s²`;
+            document.getElementById('val-slope').innerText = `${payload.Slope_% > 0 ? '+' : ''}${payload.Slope_%.toFixed(1)} %`;
+            document.getElementById('val-dist').innerText = `${payload.Distance_Travelled_km} km`;
+            document.getElementById('val-soc').innerText = `${payload['Battery_State_%']}%`;
+            document.getElementById('val-tire').innerText = `${payload.Tire_Pressure_psi} psi`;
+            document.getElementById('val-temp').innerText = `${payload.Temperature_C}°C`;
+        }
+
+        async function onTelemetryChange() {
+            const payload = getPayload();
+            updateLabels(payload);
+
+            try {
+                const res = await fetch('/api/optimize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                renderResults(data, payload);
+            } catch (err) {
+                console.error("Optimize API Error:", err);
+            }
+        }
+
+        function renderResults(data, payload) {
+            const curr = data.current_profile;
+            const opt = data.optimized_profile;
+
+            // Metrics
+            document.getElementById('metric-energy').innerText = curr.predicted_energy_kwh.toFixed(2);
+            document.getElementById('metric-dist-sub').innerText = `For ${payload.Distance_Travelled_km} km route`;
+            document.getElementById('metric-eff').innerText = curr.efficiency_km_per_kwh.toFixed(2);
+            document.getElementById('metric-wh-km').innerText = Math.round(curr.efficiency_wh_per_km);
+            
+            const scoreEl = document.getElementById('metric-score');
+            const gradeEl = document.getElementById('metric-grade');
+            const score = curr.eco_score;
+            scoreEl.innerText = Math.round(score);
+
+            if (score >= 80) {
+                scoreEl.className = "mt-2 text-2xl font-bold text-emerald-400";
+                gradeEl.innerText = "A+ (Excellent)";
+                gradeEl.className = "text-[11px] font-semibold mt-1 text-emerald-400";
+            } else if (score >= 65) {
+                scoreEl.className = "mt-2 text-2xl font-bold text-sky-400";
+                gradeEl.innerText = "B (Good)";
+                gradeEl.className = "text-[11px] font-semibold mt-1 text-sky-400";
+            } else if (score >= 45) {
+                scoreEl.className = "mt-2 text-2xl font-bold text-amber-400";
+                gradeEl.innerText = "C (Moderate)";
+                gradeEl.className = "text-[11px] font-semibold mt-1 text-amber-400";
+            } else {
+                scoreEl.className = "mt-2 text-2xl font-bold text-rose-500";
+                gradeEl.innerText = "D / F (Inefficient)";
+                gradeEl.className = "text-[11px] font-semibold mt-1 text-rose-500";
+            }
+
+            document.getElementById('metric-cluster').innerText = curr.cluster_name;
+
+            // Banner
+            document.getElementById('banner-range').innerText = `+${opt.extra_range_km.toFixed(1)} km Extra Range`;
+            document.getElementById('banner-saved-kwh').innerText = `${opt.energy_saved_kwh.toFixed(2)} kWh`;
+            document.getElementById('banner-saved-pct').innerText = `${opt.energy_saved_pct.toFixed(1)}%`;
+            document.getElementById('banner-opt-eff').innerText = `${opt.efficiency_km_per_kwh.toFixed(2)} km/kWh`;
+
+            // Comparison Chart
+            updateComparisonChart(curr.predicted_energy_kwh, opt.predicted_energy_kwh);
+
+            // Driving Tips
+            renderTips(data.tips);
+
+            // Radar Chart
+            updateRadarChart(payload, score);
+
+            // Speed Curve
+            updateSpeedCurve(payload, curr.predicted_energy_kwh);
+        }
+
+        function renderTips(tips) {
+            const container = document.getElementById('tips-container');
+            document.getElementById('tips-count').innerText = `${tips.length} Tips Generated`;
+            container.innerHTML = '';
+
+            if (tips.length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center py-6 text-slate-400 text-sm">✨ Driving parameters are fully optimal! Keep up the smooth driving.</div>`;
+                return;
+            }
+
+            tips.forEach(tip => {
+                let borderClass = 'border-amber-500/30 bg-amber-500/10 text-amber-300';
+                let dotClass = 'bg-amber-400';
+                if (tip.severity === 'high') {
+                    borderClass = 'border-rose-500/40 bg-rose-500/10 text-rose-300';
+                    dotClass = 'bg-rose-400';
+                } else if (tip.severity === 'success') {
+                    borderClass = 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300';
+                    dotClass = 'bg-emerald-400';
+                }
+
+                const card = document.createElement('div');
+                card.className = `border ${borderClass} rounded-xl p-4 space-y-2 relative`;
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full ${dotClass}"></span>
+                            <span class="text-xs font-bold text-white uppercase">${tip.category}</span>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-900/80 text-slate-300 uppercase">${tip.severity}</span>
+                    </div>
+                    <h4 class="text-sm font-bold text-slate-100">${tip.title}</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">${tip.description}</p>
+                    <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between text-xs">
+                        <span class="font-medium text-slate-200"><span class="text-emerald-400 font-bold">Action:</span> ${tip.action}</span>
+                        ${tip.potential_saving_kwh > 0 ? `<span class="text-[11px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">Save ~${tip.potential_saving_kwh} kWh</span>` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateComparisonChart(currVal, optVal) {
+            const ctx = document.getElementById('chart-comparison').getContext('2d');
+            if (comparisonChart) comparisonChart.destroy();
+
+            comparisonChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Current Driving Profile', 'AI-Optimized Profile'],
+                    datasets: [{
+                        data: [currVal, optVal],
+                        backgroundColor: ['#f43f5e', '#10b981'],
+                        borderRadius: 8,
+                        barThickness: 38
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } },
+                            title: { display: true, text: 'Energy (kWh)', color: '#94a3b8', font: { size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#cbd5e1', font: { size: 11, weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateRadarChart(payload, score) {
+            const ctx = document.getElementById('chart-radar').getContext('2d');
+            if (radarChart) radarChart.destroy();
+
+            const normSpeed = Math.min(100, (payload.Speed_kmh / 140) * 100);
+            const normAccel = Math.min(100, (Math.abs(payload.Acceleration_ms2) / 3.0) * 100);
+            const normSlope = Math.min(100, ((payload['Slope_%'] + 5) / 15) * 100);
+            const normSoc = payload['Battery_State_%'];
+
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Cruising Speed', 'Throttle/Brake Force', 'Terrain Slope', 'Eco Score', 'Battery SOC'],
+                    datasets: [{
+                        label: 'Current Profile',
+                        data: [normSpeed, normAccel, normSlope, score, normSoc],
+                        backgroundColor: 'rgba(16, 185, 129, 0.25)',
+                        borderColor: '#10b981',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255,255,255,0.1)' },
+                            grid: { color: 'rgba(255,255,255,0.08)' },
+                            pointLabels: { color: '#94a3b8', font: { size: 10 } },
+                            ticks: { display: false, min: 0, max: 100 }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function updateSpeedCurve(payload, currentEnergy) {
+            const speeds = [20, 35, 50, 65, 80, 95, 110, 125, 140];
+            const energyPoints = [];
+
+            for (const sp of speeds) {
+                const p = { ...payload, Speed_kmh: sp };
+                try {
+                    const res = await fetch('/api/predict-quick', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(p)
+                    });
+                    const d = await res.json();
+                    energyPoints.push(d.energy_kwh);
+                } catch(e) {
+                    energyPoints.push(null);
+                }
+            }
+
+            const ctx = document.getElementById('chart-speed-curve').getContext('2d');
+            if (speedCurveChart) speedCurveChart.destroy();
+
+            speedCurveChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: speeds.map(s => `${s} km/h`),
+                    datasets: [{
+                        label: 'Predicted Consumption',
+                        data: energyPoints,
+                        borderColor: '#38bdf8',
+                        backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } },
+                            title: { display: true, text: 'Energy (kWh)', color: '#94a3b8', font: { size: 10 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function runRouteSimulation() {
+            try {
+                const res = await fetch('/api/simulate-route');
+                const data = await res.json();
+                
+                const ctx = document.getElementById('chart-route-sim').getContext('2d');
+                if (routeSimChart) routeSimChart.destroy();
+
+                routeSimChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => d.segment),
+                        datasets: [
+                            {
+                                label: 'Standard Cumulative Energy (kWh)',
+                                data: data.map(d => d.cum_current_kwh),
+                                borderColor: '#ef4444',
+                                borderWidth: 2.5,
+                                tension: 0.2
+                            },
+                            {
+                                label: 'AI-Optimized Cumulative Energy (kWh)',
+                                data: data.map(d => d.cum_opt_kwh),
+                                borderColor: '#10b981',
+                                borderWidth: 2.5,
+                                tension: 0.2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#cbd5e1', font: { size: 11 } } }
+                        },
+                        scales: {
+                            y: {
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                ticks: { color: '#94a3b8', font: { size: 10 } },
+                                title: { display: true, text: 'Total Energy Consumed (kWh)', color: '#94a3b8', font: { size: 10 } }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#94a3b8', font: { size: 9 }, maxRotation: 20 }
+                            }
+                        }
+                    }
+                });
+            } catch (err) {
+                console.error("Simulation error:", err);
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            setMode(2); // Sport mode initial
+            runRouteSimulation();
+        });
+    </script>
+</body>
+</html>
+
